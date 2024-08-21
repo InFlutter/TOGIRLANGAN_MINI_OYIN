@@ -60,23 +60,17 @@ class EmberPlayer extends SpriteAnimationComponent
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is GroundBlock || other is PlatformBlock) {
       if (intersectionPoints.length == 2) {
-        // Calculate the collision normal and separation distance.
         final mid = (intersectionPoints.elementAt(0) +
-            intersectionPoints.elementAt(1)) /
-            2;
+            intersectionPoints.elementAt(1)) / 2;
 
         final collisionNormal = absoluteCenter - mid;
         final separationDistance = (size.x / 2) - collisionNormal.length;
         collisionNormal.normalize();
 
-        // If collision normal is almost upwards,
-        // ember must be on ground.
         if (fromAbove.dot(collisionNormal) > 0.9) {
           isOnGround = true;
         }
 
-        // Resolve collision by moving ember along
-        // collision normal by separation distance.
         position += collisionNormal.scaled(separationDistance);
       }
     }
@@ -93,8 +87,6 @@ class EmberPlayer extends SpriteAnimationComponent
     super.onCollision(intersectionPoints, other);
   }
 
-  // This method runs an opacity effect on ember
-  // to make it blink.
   void hit() {
     if (!hitByEnemy) {
       game.health--;
@@ -125,7 +117,7 @@ class EmberPlayer extends SpriteAnimationComponent
         game.objectSpeed = -moveSpeed;
       }
     } else {
-      game.objectSpeed = 0; // O'yinchi to'xtaganda ekran ham to'xtaydi.
+      game.objectSpeed = 0;
     }
 
     if (horizontalDirection < 0 && scale.x > 0) {
@@ -134,10 +126,8 @@ class EmberPlayer extends SpriteAnimationComponent
       flipHorizontally();
     }
 
-    // Apply basic gravity
     velocity.y += gravity;
 
-    // Determine if ember has jumped
     if (hasJumped) {
       if (isOnGround) {
         velocity.y = -jumpSpeed;
@@ -146,13 +136,10 @@ class EmberPlayer extends SpriteAnimationComponent
       hasJumped = false;
     }
 
-    // Prevent ember from jumping too fast as well as descending too fast and
-    // crashing through the ground or a platform.
     velocity.y = velocity.y.clamp(-jumpSpeed, terminalVelocity);
 
     position.y += velocity.y * dt;
 
-    // If ember fell in pit, then game over.
     if (position.y > game.size.y + size.y) {
       game.health = 0;
     }
